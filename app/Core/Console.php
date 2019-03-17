@@ -1,4 +1,11 @@
 <?php
+	/**
+	 * This is the console script for the Cloure Framework. All methods and properties are alphabetically order, so try to keep this methodology
+	 * 
+	 * @author Franco Marostica <franco@grupomarostica.com>
+	 * @license MIT
+	 */
+	
     namespace App\Core;
 
 	use App\Core\Helpers;
@@ -53,7 +60,7 @@
 						$this->print_version();
 					}
 					else {
-						$this->print($this->getColoredString("The argument ".$argv[1]." isn't valid", "red", "") . "\n");
+						$this->cprint("The argument ".$argv[1]." isn't valid", "red", "");
 					}
 				} else {
 					if($argv[1]=="make"){
@@ -62,27 +69,40 @@
 					}
 				}
 			}
-        }
-
-        
-        private function getColoredString($string, $foreground_color = null, $background_color = null) {
-            $colored_string = "";
+		}
+		
+		/**
+		 * Prints in console with colors
+		 *
+		 * @param string $string
+		 * @param string $color
+		 * @param string $bg
+		 * @return void
+		 */
+		private function cprint($string, $color="", $bg=""){
+			$colored_string = "";
 
             // Check if given foreground color found
-            if (isset($this->foreground_colors[$foreground_color])) {
-                $colored_string .= "\033[" . $this->foreground_colors[$foreground_color] . "m";
+            if (isset($this->foreground_colors[$color])) {
+                $colored_string .= "\033[" . $this->foreground_colors[$color] . "m";
             }
             // Check if given background color found
-            if (isset($this->background_colors[$background_color])) {
-                $colored_string .= "\033[" . $this->background_colors[$background_color] . "m";
+            if (isset($this->background_colors[$bg])) {
+                $colored_string .= "\033[" . $this->background_colors[$bg] . "m";
             }
 
             // Add string and end coloring
-            $colored_string .=  $string . "\033[0m";
-
-            return $colored_string;
+			$colored_string .=  $string . "\033[0m";
+			
+            print($colored_string);
 		}
 
+		/**
+		 * The make command
+		 *
+		 * @param [type] $option
+		 * @return void
+		 */
 		private function make($option){
 			if($option!=""){
 				switch ($option) {
@@ -91,74 +111,76 @@
 						$this->make_controller($path);
 						break;
 					default:
-						print($this->getColoredString("The option $option is invalid", "red", "") . "\n");
+						$this->cprint("The option $option is invalid", "red", "");
 						break;
 				}
 			} else {
-				print($this->getColoredString("You must provide an option", "red", "") . "\n");
+				$this->cprint("You must provide an option", "red", "");
 			}
 		}
 
+		/**
+		 * Make controller command
+		 *
+		 * @param string $path
+		 * @return void
+		 */
 		function make_controller($path){
 			if($path!=""){
-				if(starts_with($path, "-")){
+				if(Helpers::starts_with($path, "-")){
 					$argument = $path;
 					if($argument=="-h") print_make_controller_help();
 				}
 				else {
-					print($this->getColoredString("Arg", "red", "") . "\n");
+					$this->cprint("Arg", "red", "");
 				}
 			} else {
-				print($this->getColoredString("You must provide a path ", "red", "") . "\n");
+				$this->cprint("You must provide a path ", "red", "");
 			}
 		}
 
 		/**
-		 * Print the header on CLI
+		 * Prints the header containing framework version  
+		 *
+		 * @return void
 		 */
 		function print_header(){
-			print($this->getColoredString("Cloure framework", "yellow", ""));
-			print($this->getColoredString(" v1.0.1", "", ""));
-			print("\n\n");
+			$this->cprint("Cloure framework", "yellow", "");
+			$this->cprint(" v1.0.1", "", "");
+			$this->cprint("\n\n");
 		}
 
 		/**
-		 * Print version information
-		 */
-		function print_version(){
-			$this->print($this->getColoredString("Cloure framework", "yellow", ""));
-			$this->print($this->getColoredString(" v1.0.1", "", ""));
-			$this->print("\n\n");
-		}
-
-		/**
-		 * 
+		 * Print main help in console
+		 *
+		 * @return void
 		 */
 		function print_main_help(){
 			$this->print_header();
-			print($this->getColoredString("Use:", "green", "") . "\n");
-			print("type php cloure command [options] [arguments] to execute a command\n");
-			print("type php cloure ".$this->getColoredString("command", "yellow")." ".$this->getColoredString("option", "cyan")." -h for help \n\n");
-			print($this->getColoredString("Available commands:", "green", "") . "\n");
+			$this->cprint("Use:", "green", "");
+			$this->cprint("type php cloure command [options] [arguments] to execute a command\n");
+			$this->cprint("type php cloure ");
+			$this->cprint("command", "yellow");
+			$this->cprint("option", "cyan");
+			$this->cprint(" -h for help \n\n");
+			$this->cprint("Available commands:", "green", "");
 			
 			if(count($this->commands)==0){
-				print($this->getColoredString("\n\nOh God!. There aren't available commands!", "", "red"));
+				$this->cprint("\n\nOh God!. There aren't available commands!", "", "red");
 			} else {
 				foreach ($this->commands as $command) {
-					print($this->getColoredString("  ".$command["name"], "yellow", "")."\n");
+					$this->cprint("  ".$command["name"], "yellow", "");
 					$options = $command["options"];
 					if(count($options)>0){
-						print($this->getColoredString("       Available options", "white", "")."\n");
-						print($this->getColoredString("       -----------------", "white", "")."\n");
+						$this->cprint("       Available options", "white", "");
+						$this->cprint("       -----------------", "white", "");
 					}
 					foreach ($options as $option) {
-						print($this->getColoredString("       ".$option["name"], "cyan", "")."\n");
+						$this->cprint("       ".$option["name"], "cyan", "");
 					}
 				}
 			}
 		}
-
-		
     }
     
 ?>
