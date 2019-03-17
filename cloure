@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
     class Colors {
 		private $foreground_colors = array();
@@ -51,45 +52,7 @@
             return $colored_string;
         }
     }
-
     $colors = new Colors();
-    $commands = ["make","db"];
-    $commands = [];
-
-    //START COMMAND MAKE    
-    $cmd = [
-        "name"=>"make",
-        "options"=>[
-            [
-                "name"=>"module", "arguments"=>
-                [
-                    ["name"=>"-h"]
-                ]
-            ],
-            [
-                "name"=>"controller", "arguments"=>
-                [
-    
-                ]
-            ],
-            [
-                "name"=>"db_resource", "arguments"=>
-                [
-    
-                ]
-            ],
-            [
-                "name"=>"view", "arguments"=>
-                [
-    
-                ]
-            ],
-        ]
-    ];
-    $commands[]=$cmd;
-    
-    //END COMMAND MAKE    
-
     $selected_option = $argv[1];
 
     if($argc==1){
@@ -106,18 +69,64 @@
                 print($colors->getColoredString("The argument ".$argv[1]." isn't valid", "red", "") . "\n");
             }
         } else {
-            if(in_array($selected_option, $commands)){
-                if($argc==2){
-                    print($colors->getColoredString("Available options for $selected_option:", "green", "") . "\n");
-                } else {
-    
-                }
-            } else {
-                print($colors->getColoredString("Command ".$selected_option." doesn't exists!", "red", "") . "\n");
+            if($argv[1]=="make"){
+                $option = isset($argv[2]) ? $argv[2] : ""; 
+                make($option);
             }
-            
         }
-        
+    }
+
+    function make($option){
+        global $colors, $argv;
+        if($option!=""){
+            switch ($option) {
+                case 'controller':
+                    $path = isset($argv[3]) ? $argv[3] : "";
+                    make_controller($path);
+                    break;
+                default:
+                   print($colors->getColoredString("The option $option is invalid", "red", "") . "\n");
+
+                    break;
+            }
+        } else {
+            print($colors->getColoredString("You must provide an option", "red", "") . "\n");
+        }
+    }
+    function make_controller($path){
+        global $colors;
+        if($path!=""){
+            if(starts_with($path, "-")){
+                $argument = $path;
+                if($argument=="-h") print_make_controller_help();
+            }
+            else {
+                print($colors->getColoredString("You must provide a path", "red", "") . "\n");
+            }
+        }
+    }
+
+    function print_make_controller_help(){
+        global $colors;
+        print_header();
+
+        print($colors->getColoredString("Use:", "green", "") . "\n");
+        print("  php cloure ".
+            $colors->getColoredString("make", "yellow")." ".
+            $colors->getColoredString("controller", "cyan")." "
+        );
+        print("\n  The path could be a name or path");
+        print("\n\n".$colors->getColoredString("Examples:", "green", "") . "\n");
+        print("  php cloure ".
+            $colors->getColoredString("make", "yellow")." ".
+            $colors->getColoredString("controller", "cyan")." ".
+            $colors->getColoredString("UsersController", "")."\n"
+        );
+        print("  php cloure ".
+            $colors->getColoredString("make", "yellow")." ".
+            $colors->getColoredString("controller", "cyan")." ".
+            $colors->getColoredString("/MyFolder/MyFolder2/MyFolder-n/UsersController", "")."\n"
+        );
     }
 
     /**
