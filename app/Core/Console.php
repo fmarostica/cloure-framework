@@ -57,7 +57,7 @@
 						$this->print_main_help();
 					}
 					elseif($argv[1]=="-v"){
-						$this->print_version();
+						$this->print_header();
 					}
 					else {
 						$this->cprint("The argument ".$argv[1]." isn't valid", "red", "");
@@ -126,16 +126,44 @@
 		 * @return void
 		 */
 		function make_controller($path){
-			if($path!=""){
-				if(Helpers::starts_with($path, "-")){
-					$argument = $path;
-					if($argument=="-h") print_make_controller_help();
+			$path = $this->rmkdir($path);
+			if($path!==false){
+				$filename = basename($path);
+				$this->cprint($filename." was successfully created!", "green", "");
+			}
+		}
+
+		/**
+		 * Create folders recursively
+		 *
+		 * @param string $path
+		 * @return mixed
+		 */
+		private function rmkdir($path){
+			$path = str_replace("\\", "/", $path);
+			$path = "Controllers/".$path;
+			$path = explode("/",$path);
+			$filename = $path[count($path)-1];
+
+			if(count($path)>1){
+				$finalpath = "";
+				//loop into folders
+				for ($i=0; $i < (count($path)-1); $i++) { 
+					$finalpath.=$path[$i]."\\";
+
+					if(!file_exists($finalpath)){
+						$this->cprint("Creating dir: ", "yellow");
+						$this->cprint($path[$i]."\n", "");
+						mkdir($finalpath);
+					}
 				}
-				else {
-					$this->cprint("Arg", "red", "");
-				}
+
+				
+				$finalpath.=$filename;
+				return $finalpath;
 			} else {
 				$this->cprint("You must provide a path ", "red", "");
+				return false;
 			}
 		}
 
