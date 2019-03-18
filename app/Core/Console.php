@@ -127,9 +127,19 @@
 		 */
 		function make_controller($path){
 			$path = $this->rmkdir($path);
+
 			if($path!==false){
-				$filename = basename($path);
-				$this->cprint($filename." was successfully created!", "green", "");
+				$controllerName = basename($path["path"]);
+				$namespace = $path["namespace"];
+				$path = $path["path"].".php";
+
+				file_put_contents($path,"<?php\n", FILE_APPEND);
+				file_put_contents($path,"\tnamespace App\\".$namespace.";\n\n", FILE_APPEND);
+				file_put_contents($path,"\tclass $controllerName extends Controller{\n", FILE_APPEND);
+				file_put_contents($path,"\t\t//\n", FILE_APPEND);
+				file_put_contents($path,"\t}\n", FILE_APPEND);
+				file_put_contents($path,"?>", FILE_APPEND);
+				$this->cprint($controllerName." was successfully created!", "green", "");
 			}
 		}
 
@@ -158,9 +168,10 @@
 					}
 				}
 
-				
+				$namespace  = rtrim($finalpath, "\\");
 				$finalpath.=$filename;
-				return $finalpath;
+
+				return ["path"=>$finalpath, "namespace"=>$namespace];
 			} else {
 				$this->cprint("You must provide a path ", "red", "");
 				return false;
